@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Romaji-English Dictionary</title>
+  <style>
+    body {
+      background-color: #1e1e2f;
+      color: #f5f5f5;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    #dictionary {
+      max-width: 900px;       /* wider container for 3 columns */
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);  /* 3 equal columns */
+      gap: 1rem 2rem;        /* vertical and horizontal gaps */
+    }
+
+    .entry {
+      border-bottom: 1px solid #2a2d3c;
+      padding: 0.25rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;          /* space between romaji and english */
+    }
+
+    .romaji {
+      color: #8ab4f8;
+      font-weight: 600;
+      text-transform: lowercase;
+      min-width: 90px;       /* keep romaji a consistent width */
+    }
+
+    .english {
+      color: #d1d5db;
+      flex-grow: 1;          /* english text takes remaining space */
+    }
+	#searchBox {
+  display: block;
+  width: 100%;
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 12px 16px;
+  font-size: 16px;
+  background-color: #343541;
+  color: #ffffff;
+  border: 1px solid #3e414d;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+#searchBox::placeholder {
+  color: #888;
+}
+
+#searchBox:focus {
+  border-color: #8ab4f8;
+  background-color: #2c2f38;
+}
+
+  </style>
+</head>
+<body>
+  <h1>Romaji-English Dictionary</h1>
+  <input type="text" id="searchBox" placeholder="Search romaji or English..." />
+  <div id="dictionary"></div>
+
+  <script>
+    // Word list: [romaji, english]
+    const words = [
+      ["arigatou", "thank you"],
+      ["konnichiwa", "hello / good afternoon"],
+      ["ohayou", "good morning"],
+      ["sayounara", "goodbye"],
+      ["sumimasen", "excuse me / sorry"],
+      ["hai", "yes"],
+      ["iie", "no"],
+      ["genki", "healthy / well"],
+      ["itadakimasu", "let’s eat (before meal)"],
+      ["gochisousama", "thank you for the meal (after meal)"],     
+      ["konnichiwa", "hello"],
+	  ["sayounara", "goodbye"],
+	  ["arigatou", "thank you"],
+      ["ohayou", "good morning"],
+	  ["konbanwa", "good evening"],
+	  ["oyasumi", "good night"],
+      ["sumimasen", "excuse me / sorry"],
+	  ["onegaishimasu", "please"],
+      ["ogenki desu ka", "how are you?"],
+	  ["hai", "yes"],
+	  ["iie", "no"],
+      ["watashi", "I / me"],
+	  ["anata", "you"],
+	  ["kare", "he"], 
+	  ["kanojo", "she"],
+      ["sensei", "teacher"],
+	  ["gakkou", "school"],
+	  ["daigaku", "university"],
+      ["shigoto", "job / work"],
+	  ["uchi / ie", "home / house"], 
+	  ["kuruma", "car"],
+      ["denwa", "telephone"],
+	  ["hon", "book"],
+	  ["pen", "pen"], 
+	  ["tegami", "letter"],
+      ["tomodachi", "friend"],
+	  ["otousan", "father"],
+	  ["okaasan", "mother"],
+      ["kodomo", "child"], 
+	  ["sensei", "teacher"],
+	  ["inu", "dog"], 
+	  ["neko", "cat"],
+      ["sakana", "fish"],
+	  ["tori", "bird"],
+	  ["ushi", "cow"],
+	  ["uma", "horse"],
+      ["inu", "dog"], 
+	  ["okiru", "to get up"],
+	  ["neru", "to sleep"],
+	  ["taberu", "to eat"],
+      ["nomu", "to drink"], 
+	  ["iku", "to go"], 
+	  ["kuru", "to come"], 
+	  ["miru", "to see"],
+      ["kiku", "to listen"], 
+	  ["hanasu", "to speak"],
+	  ["yomu", "to read"],
+	  ["kaku", "to write"],
+      ["suru", "to do"],
+	  ["aruku", "to walk"],
+	  ["hashiru", "to run"],
+	  ["oyogu", "to swim"],
+      ["arau", "to wash"], 
+	  ["asobu", "to play"],
+	  ["benkyou suru", "to study"],
+	  ["kau", "to buy"],
+      ["urut", "to sell"],
+	  ["tsukuru", "to make"],
+	  ["motsu", "to have / hold"],
+      ["wakaru", "to understand"], 
+	  ["shiru", "to know"],
+	  ["aisuru", "to love"],
+      ["suki", "to like"],
+	  ["kirai", "to dislike"], 
+	  ["omou", "to think"],
+      ["iu", "to say"],
+	  ["dekiru", "can do"],
+	  ["tabetai", "want to eat"],
+      ["nomitai", "want to drink"], 
+	  ["hayai", "fast / early"],
+	  ["osoi", "slow / late"],
+      ["atarashii", "new"],
+	  ["furui", "old"],
+	  ["takai", "expensive / tall"],
+      ["yasui", "cheap"],
+	  ["ookii", "big"],
+	  ["chiisai", "small"],
+	  ["omoshiroi", "interesting"],
+      ["tanoshii", "fun"],
+	  ["muzukashii", "difficult"],
+	  ["kantan", "easy"],
+      ["atsui", "hot (weather)"],
+	  ["samui", "cold (weather)"],
+	  ["atsui", "hot (objects)"],
+      ["samui", "cold (objects)"],
+	  ["sugoi", "amazing"],
+	  ["kawaii", "cute"],
+      ["utsukushii", "beautiful"],
+	  ["warui", "bad"], 
+	  ["ii / yoi", "good"],
+      ["shiroi", "white"],
+	  ["kuroi", "black"],
+	  ["akai", "red"],
+	  ["aoi", "blue"],
+      ["midori", "green"],
+	  ["kiiroi", "yellow"],
+	  ["kitanai", "dirty"],
+	  ["kirei", "clean / pretty"],
+      ["omoi", "heavy"],
+	  ["karui", "light"],
+	  ["omoshiroi", "funny / interesting"],
+      ["tanoshii", "enjoyable"],
+	  ["mizui", "watery"] ,
+      ["iku", "to go"], ["miru", "to see"], ["ooi", "a lot, many"],
+      ["ie", "home, household"], ["kore", "this"], ["sore", "that"],
+      ["watashi", "I"], ["shigoto", "work, job"], ["itsu", "when"],
+      ["suru", "to do"], ["deru", "to go out, leave"], ["tsukau", "to use"],
+      ["tokoro", "place"], ["tsukuru", "to make"], ["omou", "to think"],
+      ["motsu", "to have, possess"], ["kau", "to buy"], ["jikan", "time, hour"],
+      ["shiru", "to know"], ["onaji", "same"], ["ima", "now"],
+      ["atarashii", "new"], ["naru", "to become"], ["mada", "not yet, still"],
+      ["ato", "after"], ["kiku", "to hear, ask"], ["iu", "to say"],
+      ["sukunai", "few, little"], ["takai", "high, tall"], ["kodomo", "child"],
+      ["sou", "so, that way"], ["mou", "already, yet"], ["gakusei", "student"],
+      ["atsui", "hot to touch"], ["douzo", "please"], ["gogo", "afternoon"],
+      ["nagai", "long"], ["hon", "book"], ["kotoshi", "this year"],
+      ["yoku", "often, well"], ["kanojo", "she, girlfriend"], ["dou", "how, what"],
+      ["kotoba", "word, language"], ["kao", "face"], ["owaru", "to finish"],
+      ["hitotsu", "one thing"], ["ageru", "to give"], ["kou", "like this"],
+      ["gakkou", "school"], ["kureru", "to give (to me)"], ["hajimeru", "to start"],
+      ["okiru", "to get up"], ["haru", "spring"], ["gozen", "morning, a.m."],
+      ["betsu", "separate, another"], ["doko", "where"], ["heya", "room"],
+      ["wakai", "young"], ["kuruma", "car"], ["oku", "to put, place"],
+      ["sumu", "to live"], ["hataraku", "to work"], ["muzukashii", "difficult"],
+      ["sensei", "teacher"], ["tatsu", "to stand"], ["yobu", "to call"],
+      ["daigaku", "university"], ["yasui", "cheap"], ["motto", "more"],
+      ["kaeru", "to return (home)"], ["wakaru", "to understand"], ["hiroi", "wide"],
+      ["suu", "number"], ["soko", "there"], ["hashiru", "to run"],
+      ["ireru", "to put in"], ["oshieru", "to teach"], ["aruku", "to walk"],
+      ["au", "to meet"], ["kaku", "to write"], ["atama", "head"],
+      ["uru", "to sell"], ["daisuki", "to love (a lot)"], ["karada", "body"],
+      ["sugu", "immediately"], ["tobu", "to fly"], ["totemo", "very"],
+      ["dare", "who"], ["suki", "to like"], ["yomu", "to read"],
+      ["tsugi", "next"], ["anata", "you"], ["nomu", "to drink"],
+      ["furui", "old"], ["shitsumon", "question"], ["kyou", "today"],
+      ["tomodachi", "friend"], ["hayai", "early, fast"], ["dore", "which"],
+      ["utsukushii", "beautiful"], ["itsumo", "always"], ["ashi", "leg, foot"],
+      ["okosu", "wake someone up"], ["miseru", "to show"], ["musume", "daughter"],
+      ["tanoshimu", "to enjoy"], ["iro", "color"], ["minna", "everyone"],
+      ["toru", "to take"], ["benkyou", "study"], ["dekiru", "can do"],
+      ["mijikai", "short"], ["ochiru", "to fall"], ["musuko", "son"],
+      ["shiroi", "white"], ["hikouki", "airplane"], ["byouki", "illness"],
+      ["fuyu", "winter"], ["toshi", "year, age"], ["omoi", "heavy"],
+      ["mune", "chest"], ["harau", "to pay"], ["karui", "light (weight)"],
+      ["mitsukeru", "to find"], ["wasureru", "to forget"], ["sake", "alcohol"],
+      ["dochira", "which (polite)"], ["ane", "older sister"], ["oboeru", "to remember"],
+      ["semai", "narrow"], ["akai", "red"], ["kiru", "to wear"],
+      ["warau", "to laugh"], ["ichiban", "number one"], ["juugyo", "class"],
+      ["shuu", "week"], ["katakana", "katakana script"], ["gohan", "meal, rice"],
+      ["dame", "no good"], ["nomimono", "drinks"], ["ame", "rain"],
+      ["kane", "money"], ["yasashii", "kind, easy"], ["kino", "yesterday"],
+      ["kumin", "citizen"], ["kyo", "capital"], ["yayoi", "spring season"],
+      ["iku","go"],["miru","see, look at"],["ooi","a lot of, many"],
+      ["ie","home, household"],["kore","this, this one"],["sore","that, that one"],
+      ["watashi","I"],["shigoto","work, job"],["itsu","when"],["suru","do, make"],
+      ["deru","go out, leave"],["tsukau","use, make use of"],["tokoro","place"],
+      ["tsukuru","make, create"],["omou","think"],["motsu","have, possess"],
+      ["kau","buy"],["jikan","time, hour"],["shiru","know"],["onaji","same, identical"],
+      ["ima","now"],["atarashii","new"],["naru","become"],["mada","not yet, still"],
+      ["ato","after"],["kiku","hear, ask"],["iu","say, tell"],["sukunai","few, little"],
+      ["takai","high, tall"],["kodomo","child"],["sou","so, that way"],["mou","already, yet"],
+  ["gakusei","student"],["atsui","hot (to touch)"],["douzo","please"],
+  ["gogo","afternoon, p.m."],["nagai","long"],["hon","book, volume"],
+  ["kotoshi","this year"],["yoku","often, well"],["kanojo","she, one’s girlfriend"],
+  ["dou","how, what"],["kotoba","word, language"],["kao","face"],
+  ["owaru","finish, end"],["hitotsu","one thing"],["ageru","give, offer"],
+  ["kou","like this, such"],["gakkou","school"],["kureru","be given"],
+  ["hajimeru","start something"],["okiru","get up"],["haru","spring"],
+  ["gozen","morning, a.m."],["betsu","another, different"],["doko","where"],
+  ["heya","room"],["wakai","young"],["kuruma","car, automobile"],
+  ["oku","put, place"],["sumu","live, reside"],["hataraku","work"],
+  ["muzukashii","difficult"],["sensei","teacher"],["tatsu","stand, rise"],
+  ["yobu","call, name"],["daigaku","university, college"],["yasui","cheap, inexpensive"],
+  ["motto","more"],["kaeru","go back home"],["wakaru","understand"],
+  ["hiroi","wide, big"],["suu","number"],["soko","there"],["hashiru","run"],
+  ["ireru","put in"],["oshieru","teach, tell"],["aruku","walk, go on foot"],
+  ["au","meet"],["kaku","write"],["atama","head"],["uru","sell"],
+  ["daisuki","like something a lot"],["karada","body, physique"],["sugu","at once, soon"],
+  ["tobu","fly"],["totemo","very"],["dare","who"],["suki","favorite, liked"],
+  ["yomu","read"],["tsugi","next"],["anata","you"],["nomu","drink"],
+  ["furui","old"],["shitsumon","question"],["kyou","today"],["tomodachi","friend, companion"],
+  ["hayai","early"],["dore","what, which"],["utsukushii","beautiful"],
+  ["itsumo","always"],["ashi","leg, foot"],["okosu","wake someone up"],
+  ["miseru","show"],["musume","daughter, girl"],["tanoshimu","enjoy"],
+  ["iro","color"],["minna","everybody"],["toru","take, get"],["benkyou","study"],
+  ["dekiru","can do, be good at"],["mijikai","short, brief"],["ochiru","fall, come down"],
+  ["musuko","son"],["shiroi","white, blank"],["hikouki","airplane"],["byouki","illness"],
+  ["fuyu","winter"],["toshi","year, age"],["omoi","heavy"],["mune","chest, breast"],
+  ["harau","pay money, respect"],["karui","light (weight)"],["mitsukeru","find"],
+  ["wasureru","forget, leave behind"],["sake","alcohol, rice wine"],["dochira","which (polite)"],
+  ["ane","one’s own older sister"],["oboeru","memorize, learn"],["semai","narrow, small"],
+  ["akai","red"],["kiru","wear, put on"],["warau","laugh, smile"],["ichiban","most, best"],
+  ["juugyo","class session, lecture"],["shuu","week"],["kanji","Chinese character"],
+  ["jitensha","bicycle"],["densha","train"],["sagasu","search for, look for"],
+  ["kami","paper"],["utau","sing"],["osoi","slow, late"],["kubi","neck"],
+  ["hayai","fast"],["issho ni","together, at the same time"],["kongetsu","this month"],
+  ["asobu","play"],["tooi","far, distant"],["yowai","weak"],["mimi","ear"],["suwaru","sit, sit down"],
+  ["migi","right"],["abiru","take a shower"],["kata","shoulder"],["neru","sleep"],
+  ["kesu","switch off, turn off"],["genki","healthy, energetic"],["zenbu","all, whole"],
+  ["kyonen","last year"],["hiku","draw, pull"],["toshokan","library"],["ageru","raise, lift"],
+  ["midori","green"],["ude","arm"],["doa","door"],["onna no ko","little girl"],
+  ["otoko no ko","boy"],["watashitachi","we"],["chikaku","near, close to"],
+  ["yaru","do, give"],["kanari","fairly, rather"],["kuni","country"],
+  ["okoru","happen"],["aki","autumn, fall"],["okuru","send"],["shinu","die"],
+  ["kimochi","feeling, sensation"],["noru","ride, take"],["iru","be present, stay"],
+  ["ki","tree, wood"],["akeru","open, unlock"],["shimeru","close, shut"],["tsuzuku","continue"],
+  ["oishasan","doctor (polite)"],["en","Japanese yen"],["koko","here"],["matsu","wait"],
+  ["hikui","low, short"],["morau","receive"],["taberu","eat"],["ani","older brother"],
+  ["namae","name"],["otto","husband"],["ichi","one"],["kekkon","marriage"],["oya","parent"],
+  ["hanasu","speak, talk"],["sukoshi","a bit, a little while"],["tojiru","close books, eyes"],
+  ["toki","time, moment"],["kome","rice grain"],["kiru","cut"],["tanoshii","fun, enjoyable"],
+  ["fuku","clothes"],["ushiro","back, behind"],["ureshii","happy, glad"],["koshi","waist"],
+  ["nichiyoubi","Sunday"],["hiru","daytime, midday"],["okaasan","mother"],
+  ["daigakusei","university student"],["owari","end, conclusion"],["se","height"],
+  ["tetsudau","help, assist"],["hana","nose"],["okiru","occur, happen"],["noseru","place, put on"],
+  ["kanashii","sad"],["shaberu","chat, talk"],["chikaku","in the near future"],
+  ["amai","sweet"],["te-buru","table"],["tabemono","food"],["hajimaru","begin"],
+  ["ge-mu","game"],["juu","ten"],["tenki","weather"],["atsui","hot (weather)"],
+  ["futoi","thick, fat"],["ban","evening, night"],["doyoubi","Saturday"],
+  ["itai","sore, painful"],["otousan","father, dad"],["tabun","probably, perhaps"],
+  ["tokei","clock, watch"],["tomaru","stay overnight"],["doushite","how come"],
+  ["kakeru","hang, put on"],["magaru","turn, make a turn"],["onaka","stomach, belly"],
+  ["mi-tingu","meeting"],["kirai","dislike"],["kinyoubi","Friday"],["iru","need, require"],
+  ["nai","to not be"],["kaze","cold illness"],["kiiro","yellow"],["yasashii","gentle, kind"],
+  ["hareru","be sunny, clear up"],["kitanai","dirty"],["chairo","brown"],["suku","be empty"],
+  ["noboru","go up, climb"],["gohan","meal, cooked rice"],["nichi","day (counter)"],
+  ["kaminoke","hair, single hair"],["tsukeru","switch on"],["getsuyoubi","Monday"],
+  ["hairu","enter"],["katakana","katakana"],["konshyu","this week"],["hiraku","open"],
+  ["mizu","water"],["are","that over there"],["nichi","two?"],["mazui","bad tasting"],
+  ["hiragana","hiragana"],["kumoru","become cloudy"],["sawaru","touch, feel"],["dame","no good"],
+  ["nomimono","beverage, drink"],["mokuyoubi","Thursday"],["youbi","day of the week"],
+  ["soba","buckwheat noodles/side?"],["kochi","here, this way casual"],["kayoubi","Tuesday"],
+  ["kawaku","be thirsty"],["san","three"],["suiyoubi","Wednesday"],["futatsu","two things"],
+  ["konban","this evening"],["sen","thousand"],["muika","sixth day"],["onesan","older sister"],
+  ["naoru","be repaired, get fixed"],["chotto","just a little"],["yon","four (Sino-Japanese)"],
+  ["korekara","from now on"],["kangaeru","think, consider"],["modoru","return"],
+  ["kaeru","change something"],["asa","morning"],["ha","tooth"],["ganbaru","work hard"],
+  ["keitaidenwa","cell phone"],["ame","rain"],["kane","money"],["yasashi","easy, simple"],
+  ["onisan","older brother"],["oki","big"],["chisai","small"],["karai","spicy, hot"],
+  ["hachi","eight"],["asoko","over there"],["kuru","come"],["mae","front, before"],
+  ["itsuka","five days, fifth"],["ippai","full"],["kyu","nine"],["suppai","sour"],
+  ["chigau","differ, be wrong"],["hosoi","thin, slender"],["mitsu","three things"],
+  ["youka","eighth"],["kokosei","high school student"],["jouzu","skillful"],
+  ["tsuyoi","strong"],["nana","seven (native)"],["hatsuka","twentieth, 20th"],
+  ["hidari","left"],["futsuka","two days, second"],["yotsu","four things"],
+  ["atatakai","warm"],["aru","exist (inanimate)"],["ii","good (colloquial)"],
+  ["ue","up, above"],["eki","station"],["oishii","tasty"],["kino","yesterday"],
+  ["kirei","pretty, clean"],["go","five"],["kokonotsu","nine things"],["onegai","request"],
+  ["kotaeru","answer"],["saki","ahead"],["samui","cold (weather)"],["shi","four (Chinese)"],
+  ["mikka","three days, third"],["shita","below"],["daijoubu","okay, all right"],
+  ["otona","adult"],["dasu","take out"],["chichi","father (humble)"],["haha","mother"],
+  ["tsuki","moon"],["imouto","younger sister"],["tsumetai","cold to touch"],["otouto","younger brother"],
+  ["te","hand"],["tooka","ten days, tenth"],["kuchi","mouth"],["natsu","summer"],
+  ["nanatsu","seven things"],["tokidoki","sometimes"],["nani","what"],["hito","person"],
+  ["hitori","one person"],["tsuitachi","first day of month"],["kokonoka","ninth day"],
+      ["hou","direction, side"],["hoka","other"],["boku","I (male)"],["hoshii","want, desire"],
+      ["man","ten thousand"],["mieru","be visible"],["michi","road, way"],["itsutsu","five things"],
+      ["me","eye"],["yattsu","eight things"],["tomeru","stop (car)"],	
+  ["akai","red"], ["aoi","blue"], ["shiroi","white"], ["kuroi","black"], ["midori","green"],
+  ["kiiroi","yellow"], ["chairo","brown"], ["murasaki","purple"], ["pinku","pink"], ["orenji","orange"],
+  ["ame","rain"], ["yuki","snow"], ["kaze","wind"], ["taiyou","sun"], ["tsuki","moon"],
+  ["hoshi","star"], ["umi","sea"], ["kawa","river"], ["yama","mountain"], ["mori","forest"],
+  ["hana","flower"], ["ki","tree"], ["kusa","grass"], ["mizu","water"], ["hi","fire"],
+  ["kaminari","thunder"], ["kumo","cloud"], ["sora","sky"], ["kawa","river"], ["ike","pond"],
+  ["inu","dog"], ["neko","cat"], ["tori","bird"], ["sakana","fish"], ["uma","horse"],
+  ["ushi","cow"], ["buta","pig"], ["kitsune","fox"], ["tanuki","raccoon dog"], ["saruu","monkey"],
+  ["zou","elephant"], ["kame","turtle"], ["kaeru","frog"], ["hebi","snake"], ["taka","hawk"],
+  ["taka","hawk"], ["kumo","spider"], ["ari","ant"], ["chou","butterfly"], ["mushi","insect"],
+  ["kyojin","giant"], ["kodomo","child"], ["otoko","man"], ["onna","woman"], ["otouto","younger brother"],
+  ["imouto","younger sister"], ["ani","older brother"], ["ane","older sister"], ["hito","person"], ["jin","people (formal)"],
+  ["sensei","teacher"], ["gakusei","student"], ["daigaku","university"], ["benkyou","study"], ["shigoto","work"],
+  ["kaisha","company"], ["jinja","shrine"], ["tera","temple"], ["eki","station"], ["kouen","park"],
+  ["machi","town"], ["shi","city"], ["kuni","country"], ["sekai","world"], ["heya","room"],
+  ["ie","house"], ["tatemono","building"], ["kuukou","airport"], ["miseki","shop"], ["kissaten","coffee shop"],
+  ["tabemono","food"], ["nomimono","drink"], ["mizu","water"], ["ocha","green tea"], ["koucha","black tea"],
+  ["miruku","milk"], ["gyuunyuu","cow milk"], ["osake","alcohol"], ["pan","bread"], ["gohan","rice (cooked)"],
+  ["niku","meat"], ["sakana","fish"], ["yasai","vegetable"], ["furu-tsu","fruit"], ["tamago","egg"],
+  ["ame","candy"], ["okashi","sweets"], ["sato","sugar"], ["shio","salt"], ["ko-sho","pepper"],
+  ["ninniku","garlic"], ["tamanegi","onion"], ["jagaimo","potato"], ["tomato","tomato"], ["kyuuri","cucumber"],
+  ["ninjin","carrot"], ["nasu","eggplant"], ["hourensou","spinach"], ["budou","grape"], ["ringo","apple"],
+  ["momo","peach"], ["banana","banana"], ["ichigo","strawberry"], ["meron","melon"], ["suika","watermelon"],
+  ["kaban","bag"], ["kutsu","shoes"], ["boushi","hat"], ["kasa","umbrella"], ["meisai","bill"],
+  ["denwa","telephone"], ["terebi","TV"], ["pasokon","PC"], ["kamera","camera"], ["rajio","radio"],
+  ["kuruma","car"], ["jitensha","bicycle"], ["densha","train"], ["hikouki","airplane"], ["basu","bus"],
+  ["fune","ship"], ["tokei","clock"], ["kasa","umbrella"], ["kagi","key"], ["saifu","wallet"],
+  ["kaban","bag"], ["kutsu","shoes"], ["kutsushita","socks"], ["nezumi","mouse"], ["sakana","fish"],
+  ["sarada","salad"], ["supagetti","spaghetti"], ["hanbun","half"], ["zenbu","all"], ["migi","right"],
+  ["hidari","left"], ["mae","front"], ["ushiro","back"], ["ue","above"], ["shita","below"],
+  ["naka","inside"], ["soto","outside"], ["tonari","next to"], ["aida","between"], ["mukae","to welcome"],
+  ["okuru","to send"], ["morau","to receive"], ["kiku","to listen"], ["miru","to see"], ["iu","to say"],
+  ["kaku","to write"], ["yomu","to read"], ["hanasu","to speak"], ["aruku","to walk"], ["hashiru","to run"],
+  ["tobu","to fly"], ["oyogu","to swim"], ["neru","to sleep"], ["okiru","to get up"], ["taberu","to eat"],
+  ["nomu","to drink"], ["kau","to buy"], ["uru","to sell"], ["tsukuru","to make"], ["shinu","to die"],
+  ["ikiru","to live"], ["hashi","bridge"], ["michi","road"], ["eki","station"], ["kippu","ticket"],
+  ["kokoro","heart"], ["chikara","power"], ["naka","inside"], ["hana","nose"], ["me","eye"],
+  ["mimi","ear"], ["kuchi","mouth"], ["te","hand"], ["ashi","foot"], ["atama","head"],
+  ["kubi","neck"], ["kata","shoulder"], ["hara","stomach"], ["senaka","back"], ["hifu","skin"],
+  ["kimochi","feeling"], ["yorokobi","joy"], ["kanashimi","sadness"], ["ikigai","reason to live"], ["aishiteru","I love you"],
+  ["arigatou","thank you"], ["sumimasen","excuse me"], ["gomen","sorry"], ["ohayou","good morning"], ["konnichiwa","hello"],
+  ["konbanwa","good evening"], ["oyasumi","good night"], ["sayounara","goodbye"], ["hai","yes"], ["iie","no"],
+  ["onegaishimasu","please"], ["douzo","go ahead"], ["mata ne","see you"], ["ganbatte","good luck"], ["otsukaresama","thank you for your work"],
+  ["itadakimasu","let’s eat"], ["gochisousama","thank you for the meal"], ["doumo","thanks"], ["yatta","I did it"], ["daijoubu","okay"],
+  ["wakaru","to understand"], ["shiranai","don’t know"], ["omoshiroi","interesting"], ["tanoshii","fun"], ["muzukashii","difficult"],
+  ["kantan","easy"], ["hayai","fast"], ["osoi","slow"], ["takai","expensive"], ["yasui","cheap"],
+  ["atsui","hot"], ["samui","cold"], ["urusai","noisy"], ["shizuka","quiet"], ["nigiyaka","lively"],
+  ["atarashii","new"], ["furui","old"], ["kirei","beautiful"], ["minikui","ugly"], ["kawaii","cute"],
+  ["omoshiroi","interesting"], ["sabishii","lonely"], ["ureshii","happy"], ["kanashii","sad"], ["komaru","troubled"],
+  ["kibishii","strict"], ["yasashii","kind"], ["genki","healthy"], ["byouki","sick"], ["nemui","sleepy"],
+  ["akarui","bright"], ["kurai","dark"], ["chiisai","small"], ["ookii","big"], ["futoi","fat"],
+  ["hosoi","thin"], ["omoi","heavy"], ["karui","light"], ["hayai","early"], ["osoi","late"],
+  ["sugoi","amazing"], ["yabai","dangerous/cool"], ["kowai","scary"], ["tanoshii","enjoyable"], ["kitanai","dirty"]
+
+
+
+
+
+	  // Add more here...
+    ];
+
+    const container = document.getElementById("dictionary");
+    const searchBox = document.getElementById("searchBox");
+
+// Handle user typing into search box
+searchBox.addEventListener("input", () => {
+  const query = searchBox.value.trim().toLowerCase();
+
+  const filtered = words.filter(([romaji, english]) => {
+    return romaji.toLowerCase().includes(query) || english.toLowerCase().includes(query);
+  });
+
+  renderList(filtered);
+});
+
+        function renderList(list) {
+      container.innerHTML = "";
+      if (list.length === 0) {
+        container.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#777;">No matches found</p>';
+        return;
+      }
+      list.forEach(([romaji, english]) => {
+        const entry = document.createElement("div");
+        entry.classList.add("entry");
+
+        const romajiSpan = document.createElement("span");
+        romajiSpan.classList.add("romaji");
+        romajiSpan.textContent = romaji;
+
+        const englishSpan = document.createElement("span");
+        englishSpan.classList.add("english");
+        englishSpan.textContent = english;
+
+        entry.appendChild(romajiSpan);
+        entry.appendChild(englishSpan);
+
+        container.appendChild(entry);
+      });
+    }
+
+    renderList(words); // This is your initial render call
+
+  </script>
+</body>
+</html>
